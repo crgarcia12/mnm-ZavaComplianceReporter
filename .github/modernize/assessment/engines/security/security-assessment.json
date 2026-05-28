@@ -1,0 +1,143 @@
+{
+  "GeneratedAt": "2026-05-28T23:11:16.0000000Z",
+  "ProjectPath": ".",
+  "Summary": {
+    "TotalFindings": 11,
+    "CveCount": 1,
+    "CweCount": 10,
+    "BySeverity": { "mandatory": 1, "optional": 4, "potential": 6 },
+    "ByCategory": {
+      "CVE": 1,
+      "Injection Attacks": 1,
+      "Code Quality": 4,
+      "Credentials & Secrets": 3,
+      "Concurrency & Synchronization": 2
+    },
+    "TotalRulesAssessed": 59,
+    "RulesPassed": 49
+  },
+  "CveFindings": [
+    {
+      "Id": "CVE-2025-59250",
+      "Name": "JDBC Driver for SQL Server has improper input validation issue",
+      "Category": "CVE",
+      "Severity": "mandatory",
+      "StoryPoint": 1,
+      "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+      "Files": ["build.gradle:19"],
+      "Explanation": "[CVE-2025-59250](https://github.com/advisories/GHSA-m494-w24q-6f7w): JDBC Driver for SQL Server has improper input validation issue\n\nSeverity: HIGH\n\nImproper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.\n\nAffected dependencies:\n  - com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre8 (declared at build.gradle:19)\n\nRecommended fix:\n  - Upgrade com.microsoft.sqlserver:mssql-jdbc to 12.8.2.jre8 or later"
+    }
+  ],
+  "CweFindings": [
+    {
+      "Id": "CWE-79",
+      "Name": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+      "Category": "Injection Attacks",
+      "Severity": "optional",
+      "StoryPoint": 8,
+      "Description": "The product does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.",
+      "Files": ["src/main/webapp/WEB-INF/jsp/reports.jsp"],
+      "Explanation": "In reports.jsp, database-sourced values are rendered using unescaped JSP EL expressions. At line 12, ${username} outputs the authenticated user's username directly into HTML without encoding. At lines 51–55, ${report.reportId}, ${report.reportType}, ${report.filingDate}, ${report.status}, and ${report.filedBy} are rendered without HTML escaping inside a c:forEach loop. JSP EL expressions (${...}) do not automatically HTML-encode output; if any database-stored value contains HTML or JavaScript, it will be rendered verbatim, enabling stored Cross-Site Scripting attacks."
+    },
+    {
+      "Id": "CWE-477",
+      "Name": "Use of Obsolete Function",
+      "Category": "Code Quality",
+      "Severity": "optional",
+      "StoryPoint": 1,
+      "Description": "The code uses deprecated or obsolete functions, which suggests that the code has not been actively reviewed or maintained.",
+      "Files": ["src/main/java/com/zavabank/compliancereporter/ComplianceConnectionFactory.java"],
+      "Explanation": "In ComplianceConnectionFactory.java at line 10, the code uses Class.forName(\"com.microsoft.sqlserver.jdbc.SQLServerDriver\") to explicitly register the JDBC driver. This pattern has been obsolete since JDBC 4.0 (Java 6): drivers are automatically discovered and registered via the ServiceLoader mechanism."
+    },
+    {
+      "Id": "CWE-772",
+      "Name": "Missing Release of Resource after Effective Lifetime",
+      "Category": "Code Quality",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "The product does not release a resource after its effective lifetime has ended, i.e., after the resource is no longer needed.",
+      "Files": ["src/main/java/com/zavabank/compliancereporter/SsoSessionService.java"],
+      "Explanation": "In SsoSessionService.java at line 93, an HttpURLConnection is opened via new URL(whoAmIUrl).openConnection() but conn.disconnect() is never called after use, causing a potential resource leak."
+    },
+    {
+      "Id": "CWE-775",
+      "Name": "Missing Release of File Descriptor or Handle after Effective Lifetime",
+      "Category": "Code Quality",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "The product does not release a file descriptor or handle after its effective lifetime has ended, i.e., after the file descriptor/handle is no longer needed.",
+      "Files": ["src/main/java/com/zavabank/compliancereporter/ComplianceConfig.java"],
+      "Explanation": "In ComplianceConfig.java at lines 12–15, the InputStream from getResourceAsStream() is not in a try-with-resources block. If PROPERTIES.load() throws a RuntimeException, the stream's close() will not be reached."
+    },
+    {
+      "Id": "CWE-1057",
+      "Name": "Data Access Operations Outside of Expected Data Manager Component",
+      "Category": "Code Quality",
+      "Severity": "potential",
+      "StoryPoint": 5,
+      "Description": "The product uses a dedicated, central data manager component as required by design, but it contains code that performs data-access operations that do not use this data manager.",
+      "Files": [
+        "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+        "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+        "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+        "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java"
+      ],
+      "Explanation": "SQL queries and ResultSet handling are embedded directly in servlet classes and SsoSessionService, with no centralized data manager or repository layer, violating separation of concerns."
+    },
+    {
+      "Id": "CWE-259",
+      "Name": "Use of Hard-coded Password",
+      "Category": "Credentials & Secrets",
+      "Severity": "optional",
+      "StoryPoint": 5,
+      "Description": "The product contains a hard-coded password, which it uses for its own inbound authentication or for outbound communication to external components.",
+      "Files": ["src/main/resources/compliance.properties"],
+      "Explanation": "In compliance.properties at line 5, the SQL Server database password is hard-coded. While ComplianceConfig.java reads this value as a fallback when DB_PASSWORD env variable is not set, the password is committed in source code."
+    },
+    {
+      "Id": "CWE-778",
+      "Name": "Insufficient Logging",
+      "Category": "Credentials & Secrets",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+      "Files": [
+        "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java",
+        "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+        "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+        "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+      ],
+      "Explanation": "Security-critical events are silently suppressed throughout the codebase. Authentication failures in SsoSessionService.java (line 38) and database errors in multiple servlets are swallowed with empty catch blocks. No logging framework is used anywhere in the application."
+    },
+    {
+      "Id": "CWE-798",
+      "Name": "Use of Hard-coded Credentials",
+      "Category": "Credentials & Secrets",
+      "Severity": "optional",
+      "StoryPoint": 5,
+      "Description": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+      "Files": ["src/main/resources/compliance.properties"],
+      "Explanation": "In compliance.properties, the SQL Server credentials are hard-coded: db.user=sa (line 4) and a database password (line 5). Using the 'sa' account with a committed password exposes the highest-privilege database account to anyone with repository access."
+    },
+    {
+      "Id": "CWE-567",
+      "Name": "Unsynchronized Access to Shared Data in a Multithreaded Context",
+      "Category": "Concurrency & Synchronization",
+      "Severity": "potential",
+      "StoryPoint": 5,
+      "Description": "The product does not properly synchronize shared data, such as static variables across threads, which can lead to undefined behavior and unpredictable data changes.",
+      "Files": ["src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"],
+      "Explanation": "In ReportsServlet.java at line 17, a SimpleDateFormat instance is declared as a static final field. SimpleDateFormat is not thread-safe; concurrent servlet requests mutate its shared internal state, potentially causing data corruption or exceptions."
+    },
+    {
+      "Id": "CWE-820",
+      "Name": "Missing Synchronization",
+      "Category": "Concurrency & Synchronization",
+      "Severity": "potential",
+      "StoryPoint": 8,
+      "Description": "The product utilizes a shared resource in a concurrent manner but does not attempt to synchronize access to the resource.",
+      "Files": ["src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"],
+      "Explanation": "The static SimpleDateFormat DATE_FORMAT field in ReportsServlet.java (line 17) is accessed concurrently with no synchronization, violating thread-safety requirements for servlet environments."
+    }
+  ]
+}
