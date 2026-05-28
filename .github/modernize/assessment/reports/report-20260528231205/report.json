@@ -165,5 +165,27 @@
       },
       "storyPoint": 8
     }
+  ],
+  "rules": {},
+  "projects": [
+    {
+      "properties": {
+        "repo": "mnm-ZavaComplianceReporter",
+        "appName": "ZavaComplianceReporter",
+        "languages": [
+          "Java"
+        ],
+        "frameworks": [
+          "Java Servlet",
+          "JSP",
+          "JSTL"
+        ],
+        "tools": [
+          "Gradle"
+        ]
+      },
+      "incidents": [],
+      "ruleInstances": []
+    }
   ]
 }
