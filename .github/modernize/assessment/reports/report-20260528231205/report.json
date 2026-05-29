@@ -1,0 +1,191 @@
+{
+  "metadata": {
+    "id": "20260528231205",
+    "generated_at": "2026-05-28T23:12:05.0000000Z",
+    "note": "Security-only report (AppCAT was not run \u2014 MCP tools unavailable in this environment)"
+  },
+  "security": [
+    {
+      "id": "CVE-2025-59250",
+      "title": "JDBC Driver for SQL Server has improper input validation issue",
+      "category": "CVE",
+      "severity": "mandatory",
+      "description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+      "evidence": {
+        "files": [
+          "build.gradle:19"
+        ],
+        "explanation": "[CVE-2025-59250](https://github.com/advisories/GHSA-m494-w24q-6f7w): JDBC Driver for SQL Server has improper input validation issue\n\nSeverity: HIGH\n\nImproper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.\n\nAffected dependencies:\n  - com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre8 (declared at build.gradle:19)\n\nRecommended fix:\n  - Upgrade com.microsoft.sqlserver:mssql-jdbc to 12.8.2.jre8 or later"
+      },
+      "storyPoint": 1
+    },
+    {
+      "id": "CWE-79",
+      "title": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+      "category": "Injection Attacks",
+      "severity": "optional",
+      "description": "The product does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users.",
+      "evidence": {
+        "files": [
+          "src/main/webapp/WEB-INF/jsp/reports.jsp"
+        ],
+        "explanation": "In reports.jsp, database-sourced values are rendered using unescaped JSP EL expressions. At line 12, ${username} outputs the authenticated user's username directly into HTML without encoding. At lines 51\u201355, ${report.reportId}, ${report.reportType}, ${report.filingDate}, ${report.status}, and ${report.filedBy} are rendered without HTML escaping inside a c:forEach loop. JSP EL expressions (${...}) do not automatically HTML-encode output; if any database-stored value contains HTML or JavaScript (e.g. a username like <script>alert(1)</script>), it will be rendered verbatim, enabling stored Cross-Site Scripting attacks."
+      },
+      "storyPoint": 8
+    },
+    {
+      "id": "CWE-477",
+      "title": "Use of Obsolete Function",
+      "category": "Code Quality",
+      "severity": "optional",
+      "description": "The code uses deprecated or obsolete functions, which suggests that the code has not been actively reviewed or maintained.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/ComplianceConnectionFactory.java"
+        ],
+        "explanation": "In ComplianceConnectionFactory.java at line 10, the code uses Class.forName(\"com.microsoft.sqlserver.jdbc.SQLServerDriver\") to explicitly register the JDBC driver. This pattern has been obsolete since JDBC 4.0 (Java 6): drivers that follow the JDBC 4.0 specification are automatically discovered and registered via the ServiceLoader mechanism, making the explicit Class.forName() call unnecessary and an indicator of outdated code."
+      },
+      "storyPoint": 1
+    },
+    {
+      "id": "CWE-772",
+      "title": "Missing Release of Resource after Effective Lifetime",
+      "category": "Code Quality",
+      "severity": "potential",
+      "description": "The product does not release a resource after its effective lifetime has ended, i.e., after the resource is no longer needed.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java"
+        ],
+        "explanation": "In SsoSessionService.java at line 93, an HttpURLConnection is opened via new URL(whoAmIUrl).openConnection() but conn.disconnect() is never called after use. The connection is not wrapped in a try-finally or try-with-resources block, so it may remain open and unreleased after the method returns, causing a resource leak."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-775",
+      "title": "Missing Release of File Descriptor or Handle after Effective Lifetime",
+      "category": "Code Quality",
+      "severity": "potential",
+      "description": "The product does not release a file descriptor or handle after its effective lifetime has ended, i.e., after the file descriptor/handle is no longer needed.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/ComplianceConfig.java"
+        ],
+        "explanation": "In ComplianceConfig.java at lines 12\u201315, the InputStream returned by getResourceAsStream(\"compliance.properties\") is not managed within a try-with-resources block. If PROPERTIES.load(inputStream) throws a RuntimeException, the stream's close() on line 15 will not be reached, leaving the file handle unreleased."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-1057",
+      "title": "Data Access Operations Outside of Expected Data Manager Component",
+      "category": "Code Quality",
+      "severity": "potential",
+      "description": "The product uses a dedicated, central data manager component as required by design, but it contains code that performs data-access operations that do not use this data manager.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+          "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+          "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java"
+        ],
+        "explanation": "Although ComplianceConnectionFactory serves as a connection factory, there is no centralized data manager or repository layer. SQL queries and ResultSet handling are embedded directly in servlet classes (GenerateReportServlet, ReportsServlet, DownloadReportServlet) and in the service class SsoSessionService, violating separation of concerns and the expectation that all data access is routed through a dedicated data manager component."
+      },
+      "storyPoint": 5
+    },
+    {
+      "id": "CWE-259",
+      "title": "Use of Hard-coded Password",
+      "category": "Credentials & Secrets",
+      "severity": "optional",
+      "description": "The product contains a hard-coded password, which it uses for its own inbound authentication or for outbound communication to external components.",
+      "evidence": {
+        "files": [
+          "src/main/resources/compliance.properties"
+        ],
+        "explanation": "In compliance.properties at line 5, the SQL Server database password is hard-coded as db.****** While ComplianceConfig.java reads this value as a fallback when the DB_PASSWORD environment variable is not set, the password is committed in the source code, making it accessible to anyone with repository access."
+      },
+      "storyPoint": 5
+    },
+    {
+      "id": "CWE-778",
+      "title": "Insufficient Logging",
+      "category": "Credentials & Secrets",
+      "severity": "potential",
+      "description": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java",
+          "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+          "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+          "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+        ],
+        "explanation": "Security-critical events are silently suppressed with empty catch blocks throughout the codebase. In SsoSessionService.java at line 38, authentication failures (SQLException) are silently ignored with no log entry, making it impossible to detect failed login attempts or brute-force attacks. In DownloadReportServlet.java at line 35, database access failures during report retrieval are swallowed. In GenerateReportServlet.java at line 112, report save failures are ignored. In ReportsServlet.java at line 44, report-listing query failures are discarded. No logging framework is used anywhere in the application."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-798",
+      "title": "Use of Hard-coded Credentials",
+      "category": "Credentials & Secrets",
+      "severity": "optional",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+      "evidence": {
+        "files": [
+          "src/main/resources/compliance.properties"
+        ],
+        "explanation": "In compliance.properties, the SQL Server database credentials are hard-coded: db.user=sa (line 4) and db.****** (line 5). Using the 'sa' (system administrator) account with a committed password in source control exposes the highest-privilege database account to anyone with read access to the repository."
+      },
+      "storyPoint": 5
+    },
+    {
+      "id": "CWE-567",
+      "title": "Unsynchronized Access to Shared Data in a Multithreaded Context",
+      "category": "Concurrency & Synchronization",
+      "severity": "potential",
+      "description": "The product does not properly synchronize shared data, such as static variables across threads, which can lead to undefined behavior and unpredictable data changes.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+        ],
+        "explanation": "In ReportsServlet.java at line 17, a SimpleDateFormat instance is declared as a private static final field: private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\"). SimpleDateFormat is not thread-safe \u2014 its internal Calendar and NumberFormat state is mutated during formatting. In a servlet container, the same servlet instance handles multiple concurrent requests on different threads; each concurrent call to DATE_FORMAT.format(filingDate) at line 39 may corrupt the shared internal state, producing garbled date strings or throwing exceptions."
+      },
+      "storyPoint": 5
+    },
+    {
+      "id": "CWE-820",
+      "title": "Missing Synchronization",
+      "category": "Concurrency & Synchronization",
+      "severity": "potential",
+      "description": "The product utilizes a shared resource in a concurrent manner but does not attempt to synchronize access to the resource.",
+      "evidence": {
+        "files": [
+          "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+        ],
+        "explanation": "The static SimpleDateFormat DATE_FORMAT field in ReportsServlet.java (line 17) is a shared mutable resource accessed concurrently by multiple servlet request-handling threads. No synchronization (synchronized block, ThreadLocal, or thread-safe alternative such as DateTimeFormatter) is used around its access at line 39, violating the requirement to synchronize access to a shared mutable resource in a multithreaded servlet environment."
+      },
+      "storyPoint": 8
+    }
+  ],
+  "rules": {},
+  "projects": [
+    {
+      "properties": {
+        "repo": "mnm-ZavaComplianceReporter",
+        "appName": "ZavaComplianceReporter",
+        "languages": [
+          "Java"
+        ],
+        "frameworks": [
+          "Java Servlet",
+          "JSP",
+          "JSTL"
+        ],
+        "tools": [
+          "Gradle"
+        ]
+      },
+      "incidents": [],
+      "ruleInstances": []
+    }
+  ]
+}
