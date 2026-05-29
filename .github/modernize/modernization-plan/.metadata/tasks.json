@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tasks template for modernization plan. Generate this file alongside plan.md to track individual migration tasks.",
+  "tasks": [
+    {
+      "type": "security",
+      "id": "001-security-remediate-findings",
+      "description": "Remediate verified dependency and application security findings before Azure deployment. Addresses issues: CVE-2025-59250: JDBC Driver for SQL Server has improper input validation issue, CWE-820: Missing Synchronization, CWE-567: Unsynchronized Access to Shared Data in a Multithreaded Context, CWE-775: Missing Release of File Descriptor or Handle after Effective Lifetime, CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting'), CWE-259: Use of Hard-coded Password, CWE-798: Use of Hard-coded Credentials, CWE-477: Use of Obsolete Function.",
+      "reason": "The assessment report identified a mandatory SQL Server JDBC driver vulnerability and several security issues that should be addressed before the application is moved to Azure.",
+      "requirements": "Scan project dependencies and runtime configuration, upgrade vulnerable dependencies to patched versions, remove hardcoded secrets from application configuration, and remediate the verified web and concurrency-related findings in the current codebase before deployment.",
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "deployment",
+      "id": "002-deployment-azure-container-apps",
+      "description": "Deploy the existing ZavaComplianceReporter web application to Azure Container Apps.",
+      "reason": "The requested modernization scope is to move the application to Azure using a minimal plan that preserves the current web workflow.",
+      "requirements": "Package and deploy the existing Java Servlet/JSP application to Azure Container Apps, preserve the current report generation and download experience, use managed identity for Azure resource access where applicable, and assume the target Azure environment already exists.",
+      "dependencies": [
+        "001-security-remediate-findings"
+      ],
+      "skills": [
+        {
+          "name": "azcli-containerapp-deploy",
+          "location": "builtin"
+        }
+      ],
+      "targetAzureService": "Azure Container Apps",
+      "resourceStatus": "existing resource",
+      "deploymentTool": "bicep"
+    }
+  ],
+  "metadata": {
+    "planName": "modernization-plan",
+    "projectName": "mnm-ZavaComplianceReporter",
+    "language": "java",
+    "createdAt": "2026-05-29T00:50:34Z",
+    "version": "1.0"
+  }
+}
