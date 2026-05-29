@@ -1,0 +1,308 @@
+{
+  "metadata": {
+    "analysisStartTime": "2026-05-29T03:29:07Z",
+    "toolVersion": "6.4.0",
+    "targetRuntime": "openjdk25",
+    "targetComputeServices": [
+      "azure-appservice",
+      "azure-aks",
+      "azure-container-apps"
+    ],
+    "assessmentDomains": [
+      "java-upgrade",
+      "cloud-readiness",
+      "security"
+    ]
+  },
+  "rules": {
+    "javax-to-jakarta-servlet": {
+      "title": "javax.servlet API replaced by jakarta.servlet",
+      "severity": "mandatory",
+      "effort": 3,
+      "labels": [
+        "domain=java-upgrade"
+      ],
+      "description": "The javax.servlet API (Servlet 3.1) has been replaced by jakarta.servlet in Jakarta EE 9 and Tomcat 10+. All javax.servlet imports and the javax.servlet-api dependency must be migrated to jakarta.servlet equivalents before the application can run on a modern container."
+    },
+    "javax-jstl-to-jakarta": {
+      "title": "JSTL 1.2 (javax namespace) replaced by JSTL 3.0 (jakarta namespace)",
+      "severity": "mandatory",
+      "effort": 1,
+      "labels": [
+        "domain=java-upgrade"
+      ],
+      "description": "The application uses javax.servlet:jstl:1.2 which uses the javax.servlet.jsp.jstl namespace. Jakarta EE 9+ requires migration to jakarta.tags (JSTL 3.0) which uses the jakarta.servlet.jsp.jstl namespace."
+    },
+    "java-version-8-upgrade": {
+      "title": "Application targets Java 8 (end of standard support)",
+      "severity": "mandatory",
+      "effort": 5,
+      "labels": [
+        "domain=java-upgrade"
+      ],
+      "description": "The application declares Java 8 as both sourceCompatibility and targetCompatibility. Java 8 reached end of standard Oracle support in March 2022. Upgrade to Java 21 LTS to gain modern language features, improved performance, and continued security patches."
+    },
+    "http-session-state-cloud": {
+      "title": "HttpSession state requires sticky sessions in cloud deployments",
+      "severity": "mandatory",
+      "effort": 5,
+      "labels": [
+        "domain=cloud-readiness"
+      ],
+      "description": "The application stores authentication state (SessionUser) in HttpSession. In a horizontally-scaled cloud environment, requests from the same user may be routed to different instances, losing session state. Sticky sessions (session affinity) must be configured, or session state must be moved to an external store (e.g., Redis, Azure Cache)."
+    },
+    "no-connection-pooling": {
+      "title": "JDBC DriverManager used without a connection pool",
+      "severity": "potential",
+      "effort": 3,
+      "labels": [
+        "domain=cloud-readiness"
+      ],
+      "description": "The application calls DriverManager.getConnection() directly on every request without a connection pool. Under load this can exhaust database connections and degrade performance. A connection pooling library such as HikariCP should be introduced before cloud deployment."
+    },
+    "http-url-connection-external": {
+      "title": "java.net.HttpURLConnection used for external service calls without retry or circuit breaker",
+      "severity": "potential",
+      "effort": 3,
+      "labels": [
+        "domain=cloud-readiness"
+      ],
+      "description": "SsoSessionService uses java.net.HttpURLConnection with hardcoded 3-second timeouts to call the ZavaBank Auth Gateway. There is no retry logic, circuit breaker, or fallback beyond an empty-string return. In a cloud environment, transient network failures can cause authentication to fail silently."
+    },
+    "war-deployment-model": {
+      "title": "WAR-based deployment requires Tomcat servlet container",
+      "severity": "optional",
+      "effort": 5,
+      "labels": [
+        "domain=cloud-readiness"
+      ],
+      "description": "The application is packaged as a WAR file deployed to an external Tomcat container. Modern cloud-native applications use an embedded server model (Spring Boot, Quarkus) for simpler containerisation, faster startup, and easier configuration management."
+    },
+    "hardcoded-db-credentials": {
+      "title": "Database credentials hardcoded in committed properties file",
+      "severity": "mandatory",
+      "effort": 1,
+      "labels": [
+        "domain=cloud-readiness"
+      ],
+      "description": "The compliance.properties file contains plaintext database credentials (db.user=sa, db.password) committed to source control. Credentials must be removed from version control and injected at runtime via a secret store (Azure Key Vault, Kubernetes Secrets) or environment variables sourced from a secure pipeline."
+    }
+  },
+  "projects": [
+    {
+      "properties": {
+        "repo": "mnm-ZavaComplianceReporter",
+        "appName": "ZavaComplianceReporter",
+        "languages": [
+          "Java"
+        ],
+        "frameworks": [
+          "Servlet 3.1",
+          "JSP",
+          "JSTL 1.2"
+        ],
+        "tools": [
+          "Gradle"
+        ],
+        "jdkVersion": "8",
+        "applicationType": "Web Application (WAR)",
+        "description": "Bank compliance reporting application for CTR and SAR filings to FinCEN",
+        "linesOfCode": 597
+      },
+      "incidents": [
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 4
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 5
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 6
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 7
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 8
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 9
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 10
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 11
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+          "line": 7
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+          "line": 8
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/DownloadReportServlet.java",
+          "line": 9
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+          "line": 7
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+          "line": 8
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/GenerateReportServlet.java",
+          "line": 9
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/HealthServlet.java",
+          "line": 4
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/HealthServlet.java",
+          "line": 5
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/HealthServlet.java",
+          "line": 6
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/LoginServlet.java",
+          "line": 4
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/LoginServlet.java",
+          "line": 5
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/LoginServlet.java",
+          "line": 6
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/LoginServlet.java",
+          "line": 7
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "line": 7
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "line": 8
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "line": 9
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "line": 10
+        },
+        {
+          "ruleId": "javax-to-jakarta-servlet",
+          "location": "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java",
+          "line": 10
+        },
+        {
+          "ruleId": "javax-jstl-to-jakarta",
+          "location": "build.gradle",
+          "line": 17
+        },
+        {
+          "ruleId": "javax-jstl-to-jakarta",
+          "location": "src/main/webapp/WEB-INF/jsp/reports.jsp",
+          "line": 2
+        },
+        {
+          "ruleId": "java-version-8-upgrade",
+          "location": "build.gradle",
+          "line": 10
+        },
+        {
+          "ruleId": "java-version-8-upgrade",
+          "location": "build.gradle",
+          "line": 11
+        },
+        {
+          "ruleId": "http-session-state-cloud",
+          "location": "src/main/java/com/zavabank/compliancereporter/AuthFilter.java",
+          "line": 26
+        },
+        {
+          "ruleId": "http-session-state-cloud",
+          "location": "src/main/java/com/zavabank/compliancereporter/LoginServlet.java",
+          "line": 29
+        },
+        {
+          "ruleId": "http-session-state-cloud",
+          "location": "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java",
+          "line": 22
+        },
+        {
+          "ruleId": "no-connection-pooling",
+          "location": "src/main/java/com/zavabank/compliancereporter/ComplianceConnectionFactory.java",
+          "line": 15
+        },
+        {
+          "ruleId": "http-url-connection-external",
+          "location": "src/main/java/com/zavabank/compliancereporter/SsoSessionService.java",
+          "line": 76
+        },
+        {
+          "ruleId": "war-deployment-model",
+          "location": "build.gradle",
+          "line": 5
+        },
+        {
+          "ruleId": "hardcoded-db-credentials",
+          "location": "src/main/resources/compliance.properties",
+          "line": 4
+        },
+        {
+          "ruleId": "hardcoded-db-credentials",
+          "location": "src/main/resources/compliance.properties",
+          "line": 5
+        }
+      ]
+    }
+  ],
+  "security": [],
+  "rearchitect": []
+}
