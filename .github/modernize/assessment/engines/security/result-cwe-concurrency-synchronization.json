@@ -1,0 +1,96 @@
+{
+  "input_name": "CWE - Concurrency & Synchronization",
+  "analysis_method": "LLM",
+  "status": "success",
+  "result": {
+    "finding": "Assessed 6 CWE rules in Concurrency & Synchronization: 2 FOUND, 4 NOT_FOUND",
+    "confidence": "high",
+    "evidence": ["Scanned application source files for concurrency & synchronization patterns"],
+    "values": [
+      {
+        "id": "CWE-543",
+        "name": "Use of Singleton Pattern Without Synchronization in a Multithreaded Context",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 5,
+        "description": "The product uses the singleton pattern when creating a resource within a multithreaded environment.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-567",
+        "name": "Unsynchronized Access to Shared Data in a Multithreaded Context",
+        "status": "FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 5,
+        "description": "The product does not properly synchronize shared data, such as static variables across threads, which can lead to undefined behavior and unpredictable data changes.",
+        "evidence": {
+          "files": [
+            "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+          ],
+          "explanation": "ReportsServlet declares a static mutable shared field at line 17: `private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\")`. SimpleDateFormat is explicitly documented as not thread-safe. In a Tomcat servlet container, a single ReportsServlet instance handles concurrent HTTP requests from multiple threads simultaneously. Each concurrent call to `DATE_FORMAT.format(filingDate)` at line 39 (inside loadReports()) accesses this shared, unsynchronized SimpleDateFormat instance, which can produce corrupted date strings, throw ArrayIndexOutOfBoundsExceptions, or return incorrect date values. There is no synchronization block, volatile declaration, or ThreadLocal wrapper protecting this shared state."
+        }
+      },
+      {
+        "id": "CWE-662",
+        "name": "Improper Synchronization",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes multiple threads or processes to allow temporary access to a shared resource that can only be exclusive to one process at a time, but it does not properly synchronize these actions, which might cause simultaneous accesses of this resource by multiple threads or processes.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-667",
+        "name": "Improper Locking",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product does not properly acquire or release a lock on a resource, leading to unexpected resource state changes and behaviors.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-820",
+        "name": "Missing Synchronization",
+        "status": "FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes a shared resource in a concurrent manner but does not attempt to synchronize access to the resource.",
+        "evidence": {
+          "files": [
+            "src/main/java/com/zavabank/compliancereporter/ReportsServlet.java"
+          ],
+          "explanation": "The static `DATE_FORMAT` field (ReportsServlet line 17) is accessed by multiple concurrent request threads without any synchronization mechanism. The `loadReports()` method (called from doGet()) calls `DATE_FORMAT.format(filingDate)` at line 39 without any synchronized block, lock, or thread-local wrapper. No attempt is made to synchronize access to this shared, non-thread-safe resource — neither the method, the field access, nor any enclosing block is synchronized."
+        }
+      },
+      {
+        "id": "CWE-821",
+        "name": "Incorrect Synchronization",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes a shared resource in a concurrent manner, but it does not correctly synchronize access to the resource.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      }
+    ]
+  },
+  "execution_time_seconds": 0,
+  "timestamp": ""
+}
