@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tasks template for modernization plan. Generate this file alongside plan.md to track individual migration tasks.",
+  "tasks": [
+    {
+      "type": "upgrade",
+      "id": "001-upgrade-java-framework-runtime",
+      "description": "Upgrade the application to the latest supported Java framework/runtime baseline for modernization readiness.",
+      "reason": "The current Java 8 and javax-based stack is legacy and should be upgraded before cloud-native migration tasks.",
+      "requirements": "Modernize the application to the latest framework/runtime baseline for Java, including required project and dependency updates needed to support subsequent Azure migration tasks.",
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "002-transform-to-azure-cloud-native-services",
+      "description": "Modernize application dependencies to Azure cloud-native managed services.",
+      "reason": "Per-plan execution goals require moving to cloud-native services as part of modernization.",
+      "requirements": "Modernize core platform dependencies to Azure cloud-native services, including managed database, configuration, and secrets management integrations aligned to application behavior.",
+      "dependencies": [
+        "001-upgrade-java-framework-runtime"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "security",
+      "id": "003-security-cve-remediation",
+      "description": "Scan dependencies for known CVEs and remediate vulnerabilities before deployment.",
+      "reason": "Security compliance requires dependency vulnerability remediation in every modernization plan.",
+      "requirements": "Upgrade vulnerable dependencies to patched versions and validate build/test health after remediation; document any major-version risk if required.",
+      "dependencies": [
+        "001-upgrade-java-framework-runtime",
+        "002-transform-to-azure-cloud-native-services"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "deployment",
+      "id": "004-deploy-to-azure-container-apps",
+      "description": "Deploy the modernized application to Azure.",
+      "reason": "The modernization goal explicitly requires deployment to Azure.",
+      "requirements": "Containerize as needed and deploy the modernized application to Azure Container Apps with production-ready configuration and validation.",
+      "dependencies": [
+        "003-security-cve-remediation"
+      ],
+      "skills": [
+        {
+          "name": "azcli-containerapp-deploy",
+          "location": "builtin"
+        }
+      ],
+      "targetAzureService": "Azure Container Apps",
+      "resourceStatus": "Create new Azure Container Apps environment and supporting resources",
+      "deploymentTool": "bicep"
+    }
+  ],
+  "metadata": {
+    "planName": "plan",
+    "projectName": "Zava Compliance Reporter",
+    "language": "java",
+    "createdAt": "2026-05-29T08:09:52Z",
+    "version": "1.0"
+  }
+}
